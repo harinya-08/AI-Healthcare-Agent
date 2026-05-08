@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediHealth — Doctor Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="static/css/doctor-dashboard.css"/>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+    <span class="logo-text">Medi<b>Health</b></span>
+  </div>
+  <div class="sidebar-bottom">
+    <a href="/login" class="nav-link logout"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log Out</span></a>
+  </div>
+</aside>
+
+<main class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h2 class="page-title">Doctor Dashboard</h2>
+    </div>
+    <div class="topbar-right">
+      <div class="avatar-wrap">
+        <div class="avatar" id="userAvatar">D</div>
+        <div class="avatar-info">
+          <span class="avatar-name" id="avatarName">Doctor</span>
+          <span class="avatar-role">Physician</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="dash-grid">
+    <section class="card hero-card">
+      <div class="hero-text">
+        <h1>Welcome Dr. <span id="doctorName">—</span><br>Manage Your Practice!</h1>
+        <p>Enter your practice data to view<br>your personalised physician dashboard.</p>
+        <button class="btn-primary" id="openFormBtn">
+          <i class="fa-solid fa-clipboard-list"></i> Enter Practice Data
+        </button>
+      </div>
+      <div class="hero-img-wrap">
+        <div class="hero-doctor-placeholder">
+          <i class="fa-solid fa-stethoscope"></i>
+        </div>
+      </div>
+    </section>
+    <section class="card stat-card" id="statPatients">
+      <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+      <div class="stat-body">
+        <div class="stat-val" id="statPatientsVal">—</div>
+        <div class="stat-label">Total Patients</div>
+        <div class="stat-trend" id="statPatientsTrend"></div>
+      </div>
+    </section>
+
+    <section class="card stat-card" id="statAppts">
+      <div class="stat-icon green"><i class="fa-solid fa-calendar-check"></i></div>
+      <div class="stat-body">
+        <div class="stat-val" id="statApptsVal">—</div>
+        <div class="stat-label">Appointments Today</div>
+        <div class="stat-trend" id="statApptsTrend"></div>
+      </div>
+    </section>
+    <section class="card summary-card">
+      <div class="card-header-row">
+        <span class="section-title-text"><i class="fa-solid fa-chart-pie"></i> Practice Summary</span>
+      </div>
+      <div class="summary-grid">
+        <div class="sum-item">
+          <div class="sum-icon green"><i class="fa-solid fa-user-check"></i></div>
+          <div class="sum-label">Recovery Rate</div>
+          <div class="sum-grade no-data" id="recoveryGrade">—</div>
+          <div class="sum-pill na" id="recoveryPill">No data</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-icon blue"><i class="fa-solid fa-calendar-days"></i></div>
+          <div class="sum-label">Appt. Fill Rate</div>
+          <div class="sum-grade no-data" id="fillGrade">—</div>
+          <div class="sum-pill na" id="fillPill">No data</div>
+        </div>
+        <div class="sum-item">
+          <div class="sum-icon purple"><i class="fa-solid fa-star"></i></div>
+          <div class="sum-label">Patient Satisfaction</div>
+          <div class="sum-grade no-data" id="satGrade">—</div>
+          <div class="sum-pill na" id="satPill">No data</div>
+        </div>
+      </div>
+      <button class="btn-download disabled" id="downloadBtn">
+        <i class="fa-solid fa-file-arrow-down"></i> Download Practice Report
+      </button>
+    </section>
+    <section class="card overview-card">
+      <div class="card-header-row">
+        <span class="section-title-text">Patient Visits Overview</span>
+        <div class="time-tabs">
+          <button class="tab active">1 Year</button>
+          <button class="tab">6 Months</button>
+          <button class="tab">3 Months</button>
+          <button class="tab">1 Month</button>
+        </div>
+      </div>
+      <div class="ov-sub-row">
+        <div>
+          <div class="ov-avg-label">Avg per month</div>
+          <div class="ov-avg-val" id="ovAvgVal">—</div>
+        </div>
+        <div class="chart-legend">
+          <span><span class="dot teal"></span>Current Period</span>
+          <span><span class="dot soft-blue"></span>Previous Period</span>
+        </div>
+      </div>
+      <div class="bar-chart-wrap">
+        <canvas id="barChart" width="600" height="130"></canvas>
+      </div>
+      <div class="bar-months">
+        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span>
+        <span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span>
+        <span>Nov</span><span>Dec</span>
+      </div>
+    </section>
+    <section class="card diagnose-card">
+      <div class="card-header-row">
+        <span class="card-label"><i class="fa-solid fa-chart-pie"></i> By Specialty</span>
+      </div>
+      <div class="donut-wrap">
+        <canvas id="donutChart" width="110" height="110"></canvas>
+        <div class="donut-center">
+          <span class="donut-num">0</span>
+          <span class="donut-sub">Patients</span>
+        </div>
+      </div>
+      <div class="donut-legend" id="donutLegend"></div>
+    </section>
+    <section class="card appt-card">
+      <div class="card-header-row">
+        <span class="section-title-text">Upcoming Appointments</span>
+        <a href="#" class="view-all-link">View All <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr><th>ID</th><th>Patient Name</th><th>Phone</th><th>Date</th><th>Time</th><th>Reason</th><th>Status</th></tr>
+          </thead>
+          <tbody id="apptTableBody">
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <i class="fa-regular fa-calendar-xmark"></i>
+                  <span>Enter your practice data to see appointments</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="card visits-card">
+      <div class="card-header-row">
+        <span class="section-title-text">Recent Patients</span>
+        <a href="#" class="view-all-link">View All <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="visits-list" id="visitsList">
+        <div class="empty-state">
+          <i class="fa-regular fa-user"></i>
+          <span>No patients recorded yet</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="modal-overlay" id="healthModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <i class="fa-solid fa-notes-medical"></i> Enter Your Practice Data
+      </div>
+      <button class="modal-close" id="modalCloseBtn">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <form id="healthForm" novalidate>
+      <div class="form-grid">
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-user-doctor"></i> Doctor Info
+        </div>
+        <div class="form-group">
+          <label for="formName">Full Name <span style="color:#e04040">*</span></label>
+          <input type="text" id="formName" placeholder="e.g. Dr. Sarah Johnson" required/>
+        </div>
+        <div class="form-group">
+          <label for="formSpecialty">Primary Specialty</label>
+          <input type="text" id="formSpecialty" placeholder="e.g. Cardiology"/>
+        </div>
+        <div class="form-group">
+          <label for="formHospital">Hospital / Clinic</label>
+          <input type="text" id="formHospital" placeholder="e.g. City Medical Center"/>
+        </div>
+        <div class="form-group">
+          <label for="formExperience">Years of Experience</label>
+          <input type="number" id="formExperience" placeholder="e.g. 12" min="0"/>
+        </div>
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-chart-bar"></i> Practice Statistics <span style="color:#e04040;font-weight:400;font-size:11px;margin-left:4px">* Required</span>
+        </div>
+        <div class="form-group">
+          <label for="formTotalPatients">Total Active Patients <span style="color:#e04040">*</span></label>
+          <input type="number" id="formTotalPatients" placeholder="e.g. 240" min="0" required/>
+        </div>
+        <div class="form-group">
+          <label for="formPrevPatients">Previous Period Patients</label>
+          <input type="number" id="formPrevPatients" placeholder="e.g. 210" min="0"/>
+        </div>
+        <div class="form-group">
+          <label for="formTodayAppts">Appointments Today <span style="color:#e04040">*</span></label>
+          <input type="number" id="formTodayAppts" placeholder="e.g. 8" min="0" required/>
+        </div>
+        <div class="form-group">
+          <label for="formSatisfaction">Patient Satisfaction (1–10)</label>
+          <input type="number" id="formSatisfaction" placeholder="e.g. 8.5" min="1" max="10" step="0.1"/>
+        </div>
+        <div class="form-group">
+          <label for="formRecoveryRate">Recovery Rate (%)</label>
+          <input type="number" id="formRecoveryRate" placeholder="e.g. 85" min="0" max="100"/>
+        </div>
+        <div class="form-group">
+          <label for="formFillRate">Appointment Fill Rate (%)</label>
+          <input type="number" id="formFillRate" placeholder="e.g. 90" min="0" max="100"/>
+        </div>
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-stethoscope"></i> Practice Notes <span style="color:#e04040;font-weight:400;font-size:11px;margin-left:4px">* Required</span>
+        </div>
+        <div class="form-group form-full">
+          <label for="formNotes">Describe current practice challenges / focus areas <span style="color:#e04040">*</span></label>
+          <textarea id="formNotes" rows="3"
+            placeholder="e.g. High patient load in cardiology, need better follow-up for post-op patients, managing chronic disease cases. Be as specific as possible." required></textarea>
+          <span style="font-size:11px;color:#9ca3af;margin-top:4px;display:block">
+            <i class="fa-solid fa-circle-info" style="color:#3a86ff"></i>
+            Practice grades are auto-computed from your stats and notes — no manual entry needed.
+          </span>
+        </div>
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-chart-bar"></i> Monthly Breakdown <span style="color:#9ca3af;font-weight:400;font-size:11px;margin-left:4px">(Optional — auto-generated if left blank)</span>
+        </div>
+        <div class="form-group form-full">
+          <label for="consultData">Current Period monthly patient counts (12 values, Jan–Dec)</label>
+          <input type="text" id="consultData" placeholder="e.g. 18,22,20,25,19,24,21,23,20,22,25,28"/>
+        </div>
+        <div class="form-group form-full">
+          <label for="checkupData">Previous Period monthly patient counts (12 values, Jan–Dec)</label>
+          <input type="text" id="checkupData" placeholder="e.g. 15,18,17,20,16,21,19,20,18,20,22,24"/>
+        </div>
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-calendar-days"></i> Upcoming Appointments
+        </div>
+        <div class="form-full" id="apptContainer">
+          <div class="appt-row">
+            <input type="text" placeholder="Patient Name" class="appt-patient"/>
+            <input type="text" placeholder="Date (e.g. Apr 20)" class="appt-date"/>
+            <input type="text" placeholder="Time (e.g. 10:00 AM)" class="appt-time"/>
+            <input type="text" placeholder="Reason (e.g. Follow-up)" class="appt-reason"/>
+            <select class="appt-status">
+              <option value="confirmed">Confirmed</option>
+              <option value="pending">Pending</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <span></span>
+          </div>
+        </div>
+        <div class="form-full">
+          <button type="button" class="add-row-btn" id="addApptBtn">
+            <i class="fa-solid fa-plus"></i> Add Appointment
+          </button>
+        </div>
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-users"></i> Recent Patients
+        </div>
+        <div class="form-full" id="visitContainer">
+          <div class="appt-row visit-row-grid">
+            <input type="text" placeholder="Patient Name" class="visit-name-input"/>
+            <input type="text" placeholder="Diagnosis / Condition" class="visit-spec-input"/>
+            <input type="date" class="visit-date-input"/>
+            <span></span>
+          </div>
+        </div>
+        <div class="form-full">
+          <button type="button" class="add-row-btn" id="addVisitBtn">
+            <i class="fa-solid fa-plus"></i> Add Patient
+          </button>
+        </div>
+
+        <!-- MediAgent -->
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-robot"></i> MediAgent Analysis
+        </div>
+        <div class="agent-toggle-card form-full">
+          <div class="agent-toggle-left">
+            <div class="agent-toggle-icon"><i class="fa-solid fa-robot"></i></div>
+            <div class="agent-toggle-text">
+              <strong>Analyse with MediAgent</strong>
+              <span>AI will analyse your practice data and generate a comprehensive practice performance report.</span>
+            </div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="runAgentAnalysis" checked/>
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+        <div class="agent-progress hidden form-full" id="agentProgress">
+          <div class="agent-progress-header">
+            <i class="fa-solid fa-robot fa-spin"></i>
+            <span id="agentProgressLabel">Connecting to MediAgent…</span>
+          </div>
+          <div class="agent-progress-track">
+            <div class="agent-progress-bar" id="agentProgressBar" style="width:0%"></div>
+          </div>
+          <div class="agent-progress-steps">
+            <span>Save Data</span>
+            <span>Agent Analysis</span>
+            <span>Build Report</span>
+          </div>
+        </div>
+
+      </div>
+      <button type="submit" class="btn-submit" id="formSubmitBtn">
+        <i class="fa-solid fa-chart-line"></i> Generate Dashboard
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- MediAgent Panel -->
+<div class="agent-panel" id="agentPanel">
+  <div class="agent-header">
+    <div class="agent-title"><i class="fa-solid fa-robot"></i> MediAgent</div>
+    <button class="agent-close" onclick="toggleAgent()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="agent-body" id="agentBody">
+    <div class="agent-intro">
+      <p><strong>Hello, Doctor!</strong> I'm your AI clinical assistant. Ask me anything about your practice, patient trends, or clinical guidelines.</p>
+    </div>
+  </div>
+  <div class="agent-chat">
+    <input type="text" id="agentInput" placeholder="Ask MediAgent…"/>
+    <button onclick="sendAgentMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+<button class="agent-fab" onclick="toggleAgent()"><i class="fa-solid fa-robot"></i></button>
+
+<script src="static/js/doctor-dashboard.js"></script>
+</body>
+</html>

@@ -15,11 +15,10 @@
   </div>
   <nav class="sidebar-nav">
     <a href="/dashboard"    class="nav-link active"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
-    <a href="/reports"      class="nav-link"><i class="fa-solid fa-file-waveform"></i><span>Reports</span></a>
     <a href="/mediagent"    class="nav-link"><i class="fa-solid fa-robot"></i><span>MediAgent</span></a>
   </nav>
   <div class="sidebar-bottom">
-    <a href="/logout"   class="nav-link logout"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log Out</span></a>
+    <a href="/logout" class="nav-link logout"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Log Out</span></a>
   </div>
 </aside>
 <main class="main-content">
@@ -71,14 +70,9 @@
       <div class="donut-wrap">
         <canvas id="donutChart" width="110" height="110"></canvas>
         <div class="donut-center">
-          <span class="donut-num">750</span>
-          <span class="donut-sub">Score</span>
+          <span class="donut-num">0</span>
+          <span class="donut-sub">Visits</span>
         </div>
-      </div>
-      <div class="donut-legend">
-        <div class="legend-item"><span class="dot green"></span>149 Neurology</div>
-        <div class="legend-item"><span class="dot blue"></span>50 Oncology</div>
-        <div class="legend-item"><span class="dot orange"></span>45 Urology</div>
       </div>
     </section>
     <section class="card summary-card">
@@ -125,8 +119,8 @@
           <div class="ov-avg-val" id="ovAvgVal">—</div>
         </div>
         <div class="chart-legend">
-          <span><span class="dot teal"></span>Consultation</span>
-          <span><span class="dot soft-blue"></span>Medical Checkup</span>
+          <span><span class="dot teal"></span>Current Visits</span>
+          <span><span class="dot soft-blue"></span>Previous Visits</span>
         </div>
       </div>
       <div class="bar-chart-wrap">
@@ -185,77 +179,60 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-
     <form id="healthForm" novalidate>
       <div class="form-grid">
         <div class="form-section-title form-full">
           <i class="fa-solid fa-user"></i> Personal Info
         </div>
         <div class="form-group">
-          <label for="formName">Full Name</label>
+          <label for="formName">Full Name <span style="color:#e04040">*</span></label>
           <input type="text" id="formName" placeholder="Enter your full name" required/>
         </div>
         <div class="form-group">
           <label for="formBpm">Resting Heart Rate (BPM)</label>
-          <input type="number" id="formBpm" placeholder="Enter your heart rate" min="30" max="220"/>
+          <input type="number" id="formBpm" placeholder="e.g. 72" min="30" max="220"/>
         </div>
         <div class="form-section-title form-full">
-          <i class="fa-solid fa-heart-pulse"></i> Health Summary
+          <i class="fa-solid fa-stethoscope"></i> Symptoms <span style="color:#e04040;font-weight:400;font-size:11px;margin-left:4px">* Required</span>
         </div>
-        <div class="form-group">
-          <label for="formVitals">Vitals Grade</label>
-          <select id="formVitals">
-            <option value="A+">A+ — Excellent</option>
-            <option value="A" selected>A — Great</option>
-            <option value="A-">A– — Good</option>
-            <option value="B+">B+ — Above Average</option>
-            <option value="B">B — Average</option>
-            <option value="C">C — Needs Attention</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="formMed">Medication Adherence Grade</label>
-          <select id="formMed">
-            <option value="A+">A+ — Never Missed</option>
-            <option value="A">A — Excellent</option>
-            <option value="B+" selected>B+ — Good</option>
-            <option value="B">B — Average</option>
-            <option value="C">C — Needs Improvement</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="formMental">Mental Health Grade</label>
-          <select id="formMental">
-            <option value="A+" selected>A+ — Very Stable</option>
-            <option value="A">A — Stable</option>
-            <option value="A-">A– — Mostly Stable</option>
-            <option value="B+">B+ — Mild Stress</option>
-            <option value="B">B — Moderate</option>
-            <option value="C">C — Needs Support</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="formAvgVisits">Avg Monthly Visits</label>
-          <input type="number" id="formAvgVisits" placeholder="Enter avg visits per month" min="0"/>
+        <div class="form-group form-full">
+          <label for="formSymptoms">Describe your current symptoms <span style="color:#e04040">*</span></label>
+          <textarea id="formSymptoms" rows="3"
+            placeholder="e.g. Mild headache, occasional fatigue, slight back pain — be as specific as possible. Grades are computed from your symptoms." required></textarea>
+          <span style="font-size:11px;color:#9ca3af;margin-top:4px;display:block">
+            <i class="fa-solid fa-circle-info" style="color:#3a86ff"></i>
+            Health grades (Vitals, Medication, Mental) are auto-computed from your symptoms, visit count, and BPM — you don't need to enter them manually.
+          </span>
         </div>
         <div class="form-section-title form-full">
-          <i class="fa-solid fa-chart-bar"></i> Monthly Overview (Optional)
+          <i class="fa-solid fa-calendar-check"></i> Visit Counts <span style="color:#e04040;font-weight:400;font-size:11px;margin-left:4px">* Required</span>
+        </div>
+        <div class="form-group">
+          <label for="formTotalVisits">Current Period Total Visits <span style="color:#e04040">*</span></label>
+          <input type="number" id="formTotalVisits" placeholder="e.g. 8 (this year / period)" min="0" required/>
+        </div>
+        <div class="form-group">
+          <label for="formPreviousVisits">Previous Period Total Visits</label>
+          <input type="number" id="formPreviousVisits" placeholder="e.g. 5 (last year / period)" min="0"/>
+        </div>
+        <div class="form-section-title form-full">
+          <i class="fa-solid fa-chart-bar"></i> Monthly Breakdown <span style="color:#9ca3af;font-weight:400;font-size:11px;margin-left:4px">(Optional — auto-generated if left blank)</span>
         </div>
         <div class="form-group form-full">
-          <label for="consultData">Consultation counts (12 comma-separated values, Jan–Dec)</label>
-          <input type="text" id="consultData" placeholder="Enter 12 values e.g. 38,52,61,45,70,55,66,48,72,50,68,80"/>
+          <label for="consultData">Current Period monthly counts (12 values, Jan–Dec)</label>
+          <input type="text" id="consultData" placeholder="e.g. 1,2,0,1,1,0,2,1,0,0,1,0"/>
         </div>
         <div class="form-group form-full">
-          <label for="checkupData">Medical Checkup counts (12 comma-separated values)</label>
-          <input type="text" id="checkupData" placeholder="Enter 12 values e.g. 20,30,25,35,40,28,44,32,38,42,36,50"/>
+          <label for="checkupData">Previous Period monthly counts (12 values, Jan–Dec)</label>
+          <input type="text" id="checkupData" placeholder="e.g. 0,1,0,0,1,0,1,0,1,0,0,1"/>
         </div>
         <div class="form-section-title form-full">
           <i class="fa-solid fa-calendar-days"></i> Appointments
         </div>
         <div class="form-full" id="apptContainer">
           <div class="appt-row">
-            <input type="text" placeholder="Enter doctor name" class="appt-dr"/>
-            <input type="text" placeholder="Enter date (e.g. July 10)" class="appt-date"/>
+            <input type="text" placeholder="Doctor Name" class="appt-dr"/>
+            <input type="text" placeholder="Date (e.g. July 10)" class="appt-date"/>
             <select class="appt-status">
               <option value="confirmed">Confirmed</option>
               <option value="pending">Pending</option>
@@ -274,9 +251,9 @@
         </div>
         <div class="form-full" id="visitContainer">
           <div class="appt-row">
-            <input type="text" placeholder="Enter doctor name" class="visit-name-input"/>
-            <input type="text" placeholder="Enter speciality" class="visit-spec-input"/>
-            <input type="text" placeholder="Enter time (e.g. 10:30 AM)" class="visit-time-input"/>
+            <input type="text" placeholder="Doctor Name" class="visit-name-input"/>
+            <input type="text" placeholder="Speciality (e.g. Cardiology)" class="visit-spec-input"/>
+            <input type="date" class="visit-date-input"/>
             <span></span>
           </div>
         </div>
@@ -290,7 +267,7 @@
         </div>
         <div class="form-group form-full">
           <label for="formNotes">Additional Notes (optional)</label>
-          <textarea id="formNotes" placeholder="Enter any symptoms, medications, or notes…"></textarea>
+          <textarea id="formNotes" placeholder="Enter any medications you take, allergies, recent tests, or other notes…"></textarea>
         </div>
         <div class="form-section-title form-full">
           <i class="fa-solid fa-robot"></i> MediAgent Analysis
@@ -300,7 +277,7 @@
             <div class="agent-toggle-icon"><i class="fa-solid fa-robot"></i></div>
             <div class="agent-toggle-text">
               <strong>Analyse with MediAgent</strong>
-              <span>AI will analyse your data and generate a full health report available in the Reports section.</span>
+              <span>AI will analyse your symptoms &amp; data and generate a full health report in the Reports section.</span>
             </div>
           </div>
           <label class="toggle-switch">
@@ -324,11 +301,12 @@
         </div>
       </div>
       <button type="submit" class="btn-submit" id="formSubmitBtn">
-        <i class="fa-solid fa-chart-line"></i> Generate Your Report
+        <i class="fa-solid fa-chart-line"></i> Generate Dashboard
       </button>
     </form>
   </div>
 </div>
+
 <script src="/static/js/dashboard.js"></script>
 </body>
 </html>

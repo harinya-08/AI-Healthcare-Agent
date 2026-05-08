@@ -12,7 +12,7 @@
     <div class="about-div">
     <div class="display-buttons">
         <button type="button" class="button-class" onclick="window.location.href='/login'">Login</button>
-        <button type="button" class="button-class">Signup</button>
+        <button type="button" class="button-class" onclick="window.location.href='/signup'">Signup</button>
     </div>
     <video autoplay muted loop playsinline class="background-video">
         <source src="/static/assets/background.mp4" type="video/mp4"/>
@@ -21,7 +21,7 @@
     <div class="video-overlay">
         <div class="search-container-main">
         <input type="search" class="search-bar1" placeholder="Search for Doctors, Specialities And Health Checkups..."/>
-        <button class="search-icon-btn1"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="search-icon-btn1" onclick="window.location.href='/login'"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         <div class="action-pills">
         <div class="pill">Find Hospital <i class="fa-solid fa-arrow-right"></i></div>
@@ -48,49 +48,47 @@
         </p>
     </div>
     </div>
-
-    <br/><br/><br/><br/>
     <div class="ai-features-section">
-    <div class="main-content-layout">
-        <div class="text-content-column">
-        <h2>Why Choose Our AI-Driven Management System?</h2>
-        <p>
-            Our platform combines Agentic AI with advanced deep learning technologies to transform modern healthcare systems.
-            It analyzes medical data, patient records, and diagnostic reports with high precision.
-            This enables hospitals to make faster and more accurate clinical decisions.
-            The system also improves operational efficiency by automating complex medical workflows.
-            Ultimately, it enhances patient outcomes while supporting doctors with intelligent insights.
-        </p>
-        <div class="section-wrapper">
-            <div class="capabilities-grid">
-            <div class="capability-item">
-                <div class="icon-holder"><i class="fa-solid fa-file-import"></i></div>
-                <div class="capability-text">
-                <h3>99% Extraction Accuracy</h3>
-                <p>Advanced OCR + NLP instantly digitizes PDF reports.</p>
+        <div class="main-content-layout">
+            <div class="text-content-column">
+            <h2>Why Choose Our AI-Driven Management System?</h2>
+            <p>
+                Our platform combines Agentic AI with advanced deep learning technologies to transform modern healthcare systems.
+                It analyzes medical data, patient records, and diagnostic reports with high precision.
+                This enables hospitals to make faster and more accurate clinical decisions.
+                The system also improves operational efficiency by automating complex medical workflows.
+                Ultimately, it enhances patient outcomes while supporting doctors with intelligent insights.
+            </p>
+            <div class="section-wrapper">
+                <div class="capabilities-grid">
+                <div class="capability-item">
+                    <div class="icon-holder"><i class="fa-solid fa-file-import"></i></div>
+                    <div class="capability-text">
+                    <h3>99% Extraction Accuracy</h3>
+                    <p>Advanced OCR + NLP instantly digitizes PDF reports.</p>
+                    </div>
+                </div>
+                <div class="capability-item">
+                    <div class="icon-holder"><i class="fa-solid fa-microchip"></i></div>
+                    <div class="capability-text">
+                    <h3>Proactive Risk Analysis</h3>
+                    <p>ML models analyze lab values to predict disease risks.</p>
+                    </div>
+                </div>
+                <div class="capability-item">
+                    <div class="icon-holder"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div class="capability-text">
+                    <h3>Real-time Analytics</h3>
+                    <p>Full frontend dashboard for patient trends and hospital performance.</p>
+                    </div>
+                </div>
                 </div>
             </div>
-            <div class="capability-item">
-                <div class="icon-holder"><i class="fa-solid fa-microchip"></i></div>
-                <div class="capability-text">
-                <h3>Proactive Risk Analysis</h3>
-                <p>ML models analyze lab values to predict disease risks.</p>
-                </div>
             </div>
-            <div class="capability-item">
-                <div class="icon-holder"><i class="fa-solid fa-chart-pie"></i></div>
-                <div class="capability-text">
-                <h3>Real-time Analytics</h3>
-                <p>Full frontend dashboard for patient trends and hospital performance.</p>
-                </div>
-            </div>
+            <div class="video-column">
+            <img src="/static/assets/unnamed.jpg" alt="AI Healthcare"/>
             </div>
         </div>
-        </div>
-        <div class="video-column">
-        <img src="/static/assets/unnamed.jpg" alt="AI Healthcare"/>
-        </div>
-    </div>
     </div>
     <div class="features-grid">
     <section class="hero-section">
@@ -101,7 +99,7 @@
         plan for you with free doctor and specialist consultations included!
         </p>
         <h2 class="sub-heading">Customise Your Unique Health Check</h2>
-        <button class="cta-button">BOOK HEALTH CHECK-UP <span><i class="fa-solid fa-arrow-right"></i></span></button>
+        <button class="cta-button" onclick="window.location.href='/login'">BOOK HEALTH CHECK-UP <span><i class="fa-solid fa-arrow-right"></i></span></button>
     </section>
 
     <div class="cards-wrapper">

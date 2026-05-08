@@ -11,10 +11,9 @@ from typing import List, Optional, Any, Dict
 import uvicorn
 import os
 import traceback
-import uuid
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import sessionmaker, declarative_base, Session
+from sqlalchemy.orm import sessionmaker, declarative_base, Session  
 from passlib.context import CryptContext
 router = APIRouter()
 load_dotenv()
@@ -25,7 +24,6 @@ SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 Base = declarative_base()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI(title="MediHealth")
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("FASTAPI_SECRET_KEY"))
 oauth = OAuth()
@@ -48,6 +46,13 @@ class User(Base):
     email = Column(String(255), unique=True, index=True)
     password = Column(String(255))
     role = Column(String(50), default="patient")
+class Doctor(Base):
+    __tablename__ = "doctors"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, index=True)
+    doctor_id = Column(String(100), unique=True, index=True)  
+    password = Column(String(255))
+Base.metadata.create_all(bind=engine)
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=30))
@@ -107,7 +112,7 @@ async def login_post(
     access_token = create_access_token(
         data={"sub": str(user.id), "email": user.email}
     )
-    response = RedirectResponse(url="/dashboard", status_code=303)
+    response = RedirectResponse(url="/analysis", status_code=303)
     response.set_cookie(
         key="access_token",
         value=access_token,
@@ -165,18 +170,18 @@ async def signup_post(
     ):
     if password != confirm_password:
         return templates.TemplateResponse(
-            "signup.html",
-            {
-                "request": request,
+            request=request,
+            name="signup.html",
+            context={
                 "error_msg": "Passwords do not match"
             }
         )
     existing_user = db.query(User).filter(User.email == email).first()
     if existing_user:
         return templates.TemplateResponse(
-            "signup.html",
-            {
-                "request": request,
+            request=request,
+            name="signup.html",
+            context={
                 "error_msg": "User already exists"
             }
         )
@@ -184,47 +189,44 @@ async def signup_post(
     new_user = User(
         email=email,
         password=hashed_password,
-        role="patient"   
+        role="patient"
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return templates.TemplateResponse(
-        "login.html",
-        {
-            "request": request,
+        request=request,
+        name="login.html",
+        context={
             "success_msg": "Account created successfully! Please login."
         }
     )
 @app.get("/login/doctor")
 async def doctor_login_page(request: Request):
-    return templates.TemplateResponse(
-        "doctor_login.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse(request=request,name="doctor_login.html",context={"request": request})
 @app.post("/login/doctor")
 async def doctor_login_post(
         request: Request,
         email: str = Form(...),
+        doctor_id: str = Form(...),
         password: str = Form(...),
         db: Session = Depends(get_db)
     ):
-    user = db.query(User).filter(
-        User.email == email,
-        User.role == "doctor"   
+    doctor = db.query(Doctor).filter(
+        Doctor.email == email,
+        Doctor.doctor_id == doctor_id
     ).first()
-    if not user:
-        return templates.TemplateResponse(
-            "doctor_login.html",
-            {"request": request, "error_msg": "Doctor not found"}
-        )
-    if not pwd_context.verify(password, user.password):
-        return templates.TemplateResponse(
-            "doctor_login.html",
-            {"request": request, "error_msg": "Incorrect password"}
-        )
+    if not doctor:
+        return templates.TemplateResponse(request=request,name="doctor_login.html",context={"error_msg": "Invalid credentials"})
+    if not pwd_context.verify(password, doctor.password):
+        return templates.TemplateResponse(request=request,name="doctor_login.html",context={"error_msg": "Incorrect password"})
     access_token = create_access_token(
-        data={"sub": str(user.id), "role": "doctor"}
+        data={
+            "sub": str(doctor.id),
+            "email": doctor.email,
+            "role": "doctor",
+            "doctor_id": doctor.doctor_id
+        }
     )
     response = RedirectResponse(url="/doctor-dashboard", status_code=303)
     response.set_cookie(
@@ -236,60 +238,54 @@ async def doctor_login_post(
     return response
 @app.get("/signup/doctor")
 async def doctor_signup_page(request: Request):
-    return templates.TemplateResponse(
-        "doctor_signup.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse(request=request,name="doctor_signup.html",context={"request": request})
 @app.post("/signup/doctor")
 async def doctor_signup_post(
         request: Request,
         email: str = Form(...),
+        doctor_id: str = Form(...),
         password: str = Form(...),
+        confirm_password: str = Form(...),
         db: Session = Depends(get_db)
     ):
-    existing_user = db.query(User).filter(User.email == email).first()
-    if existing_user:
+    if password != confirm_password:
         return templates.TemplateResponse(
-            "doctor_signup.html",
-            {
-                "request": request, 
-                "error_msg": "Doctor already exists"
-            }
+            request=request,
+            name="doctor_signup.html",
+            context={"error_msg": "Passwords do not match"}
+        )
+    existing_doctor = db.query(Doctor).filter(
+        (Doctor.email == email) | (Doctor.doctor_id == doctor_id)
+    ).first()
+    if existing_doctor:
+        return templates.TemplateResponse(
+            request=request,
+            name="doctor_signup.html",
+            context={"error_msg": "Doctor already exists"}
         )
     hashed_password = pwd_context.hash(password)
-    new_user = User(
+    new_doctor = Doctor(
         email=email,
-        password=hashed_password,
-        role="doctor"   
+        doctor_id=doctor_id,
+        password=hashed_password
     )
-    db.add(new_user)
+    db.add(new_doctor)
     db.commit()
-    db.refresh(new_user)
-    return templates.TemplateResponse(
-        "doctor_login.html",
-        {
-            "request": request, 
-            "success_msg": "Doctor account created successfully"
-        }
-    )
+    db.refresh(new_doctor)
+    request.session["success_msg"] = "Doctor account created successfully!"
+    return RedirectResponse(url="/login/doctor", status_code=303)
 @app.get("/doctor-dashboard")
 async def doctor_dashboard(request: Request):
-    return templates.TemplateResponse(
-        "doctor-dashboard.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse(request=request, name="doctor_dashboard.html", context={})
 @app.get("/analysis", response_class=HTMLResponse)
 async def analysis(request: Request):
     return templates.TemplateResponse(request=request, name="analysis.html", context={})
 @app.get("/mediagent", response_class=HTMLResponse)
 async def mediagent(request: Request):
     return templates.TemplateResponse(request=request, name="mediagent.html", context={})
-@app.get("/reports", response_class=HTMLResponse)
-async def reports(request: Request):
-    return templates.TemplateResponse(request=request, name="report.html", context={})
 @app.get("/logout",response_class=HTMLResponse)
 async def logout(request:Request):
-    return templates.TemplateResponse(request=request,name="settings.html",context={})
+    return templates.TemplateResponse(request=request,name="information.html",context={})
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     allowed_types = [

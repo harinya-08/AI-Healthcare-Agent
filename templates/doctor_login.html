@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/doctor-login.css">
+</head>
+<body>
+<div class="login-page-container">
+    <div class="login-image-section">
+        <img src="/static/assets/d23a624c-c4a4-4693-821e-0f8f6b2449a2.jpg" alt="Doctor" class="bg-image">
+    </div>
+    <div class="login-form-section">
+        <div class="form-wrapper">
+            <div class="alert-container">
+                {% if success_msg %}
+                <div class="alert alert-success auto-dismiss text-center">
+                    {{ success_msg }}
+                </div>
+                {% endif %}
+
+                {% if error_msg %}
+                <div class="alert alert-danger auto-dismiss text-center">
+                    <strong>Error!</strong> {{ error_msg }}
+                </div>
+                {% endif %}
+            </div>
+            <h2 class="welcome-text">Doctor Login</h2>
+            <form action="/login/doctor" method="post">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Enter Email" required>
+                </div>
+                <br>
+                <div class="input-group">
+                    <label>Doctor ID</label>
+                    <input type="text" name="doctor_id" placeholder="Enter Doctor ID" required>
+                </div>
+                <br>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Enter Password" required>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary continue-btn">Login</button>
+            </form>
+            <br>
+            <p class="terms-text">
+                Don't Have an Account ? <a href="/signup/doctor">Signup</a>
+            </p>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    setTimeout(() => {
+        document.querySelectorAll(".auto-dismiss").forEach(alertBox => {
+            alertBox.style.transition = "opacity 0.5s ease";
+            alertBox.style.opacity = "0";
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+        });
+    }, 3000); 
+</script>
+</body>
+</html>
